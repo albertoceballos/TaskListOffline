@@ -4,40 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.aac088.tasklistoffline.MainActivity"
-    tools:layout_editor_absoluteY="25dp"
-    tools:layout_editor_absoluteX="0dp">
+    tools:context="com.example.aac088.tasklistoffline.TaskActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/main_toolbar"
+        android:id="@+id/task_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:titleTextColor="@android:color/background_light" />
+        app:titleTextColor="@android:color/background_light"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <ListView
-        android:id="@+id/main_listview"
+        android:id="@+id/task_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/task_toolbar"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/main_toolbar" />
+        android:layout_alignParentStart="true" />
 
     <ImageView
-        android:id="@+id/main_add_imgvw"
+        android:id="@+id/task_add_imgvw"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="39dp"
-        android:layout_marginEnd="17dp"
-        android:layout_marginRight="17dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginEnd="41dp"
+        android:layout_marginRight="41dp"
         app:srcCompat="@android:drawable/ic_input_add" />
 
 </RelativeLayout>
