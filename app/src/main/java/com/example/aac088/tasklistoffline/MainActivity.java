@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                         db.update(TaskContract.TaskEntry.TABLE,values,selectoin,selectionArgs);
                         updateUI();
                     }
-                });
+                });//asd
                 editBuilder.setNegativeButton("Cancel",null);
                 editBuilder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
                     @Override

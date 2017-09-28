@@ -69,7 +69,7 @@ public class TaskActivity extends AppCompatActivity {
                         model.add(new Model(new_task, false));
                         customAdapter.notifyDataSetChanged();
                     }
-                });
+                });//njn
                 editTask.setNegativeButton("CANCEL",null);
                 editTask.create().show();
             }

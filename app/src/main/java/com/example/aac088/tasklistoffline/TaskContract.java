@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
  * Created by aac088 on 9/28/2017.
  */
 
-public class TaskContract {
+public class TaskContract {//asd
 
     public static final String DB_NAME = "com.example.aac088.tasklistoffline";
 
