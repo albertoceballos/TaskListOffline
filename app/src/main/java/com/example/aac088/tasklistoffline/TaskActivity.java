@@ -1,5 +1,6 @@
 package com.example.aac088.tasklistoffline;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +31,7 @@ public class TaskActivity extends AppCompatActivity {
     private ArrayList<Model> model;
     private ImageView add_task;
     private DBHelper mHelper;
+    private String list_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,34 +42,43 @@ public class TaskActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tasks");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        listView = (ListView) findViewById(R.id.task_listview);
 
-        mHelper = new DBHelper(this);
+        mHelper = new DBHelper(TaskContract.context);
+
+        Bundle bundle = getIntent().getExtras();
+        list_name = bundle.getString("list_name");
 
         updateUI();
 
-        model = new ArrayList<>();
-        model.add(0,new Model("task 1",false));
-        model.add(1,new Model("task 2",false));
-        customAdapter = new CustomAdapter(model);
-        listView = (ListView) findViewById(R.id.task_listview);
-        listView.setAdapter(customAdapter);
+        //model = new ArrayList<>();
+        //model.add(0,new Model("task 1",false));
+        //model.add(1,new Model("task 2",false));
+        //customAdapter = new CustomAdapter(model);
+
+
+       // listView.setAdapter(customAdapter);
 
         add_task.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 AlertDialog.Builder editTask = new AlertDialog.Builder(TaskActivity.this);
-                editTask.setTitle("Change task name");
-                editTask.setMessage("Change name and update");
+                editTask.setTitle("Add new Task");
+                editTask.setMessage("Add new Task");
                 final EditText editText = new EditText(TaskActivity.this);
-                editText.setText("New Task Name");
+                editText.setText("");
                 editTask.setView(editText);
                 editTask.setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String new_task = editText.getText().toString();
-                        //Implement add,update,delete in this class
-                        model.add(new Model(new_task, false));
-                        customAdapter.notifyDataSetChanged();
+                        SQLiteDatabase db = mHelper.getWritableDatabase();
+                        ContentValues values = new ContentValues();
+                        values.put(TaskContract.TaskEntry.COL_USER_DATA_LIST_TASK,new_task);
+                        values.put(TaskContract.TaskEntry.COL_USER_DATA_LIST,list_name);
+                        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,null,values,SQLiteDatabase.CONFLICT_REPLACE);
+                        db.close();
+                        updateUI();
                     }
                 });//njn
                 editTask.setNegativeButton("CANCEL",null);
@@ -83,19 +94,22 @@ public class TaskActivity extends AppCompatActivity {
     private void updateUI() {
         model = new ArrayList<>();
         SQLiteDatabase db = mHelper.getReadableDatabase();
+        String query = "SELECT * FROM "+TaskContract.TaskEntry.TABLE +" WHERE "+TaskContract.TaskEntry.COL_USER_DATA_LIST+" ='" + list_name+"'";
 
-        Cursor cursor = db.query(TaskContract.TaskEntry.TABLE,
-                new String[]{TaskContract.TaskEntry._ID, TaskContract.TaskEntry.COL_USER_DATA_LIST,TaskContract.TaskEntry.COL_USER_DATA_LIST_TASK},
-                null,null,null,null,null);
+        Cursor cursor = db.rawQuery(query,null);
         while(cursor.moveToNext()){
-            int index = cursor.getColumnIndex(TaskContract.TaskEntry.COL_USER_DATA_LIST);
-            model.add(new Model(cursor.getString(index),false));
+            System.out.println("RUNNIg");
+            int index = cursor.getColumnIndex(TaskContract.TaskEntry.COL_USER_DATA_LIST_TASK);
+            System.out.println(cursor.getString(index));
+            model.add(0,new Model(cursor.getString(index),false));
         }
 
         if(customAdapter == null){
             customAdapter = new CustomAdapter(model);
             listView.setAdapter(customAdapter);
         }else{
+            customAdapter.modelArrayList.clear();
+            customAdapter.modelArrayList.addAll(model);
             customAdapter.notifyDataSetChanged();
         }
 
@@ -105,6 +119,7 @@ public class TaskActivity extends AppCompatActivity {
 
     public class CustomAdapter extends BaseAdapter{
         private ArrayList<Model> modelArrayList;
+
 
         public CustomAdapter(ArrayList<Model> modelArrayList){
             this.modelArrayList=modelArrayList;
@@ -164,13 +179,20 @@ public class TaskActivity extends AppCompatActivity {
                     editTask.setMessage("Change name and update");
                     final EditText editText = new EditText(TaskActivity.this);
                     editText.setText(modelArrayList.get(pos).getTask().toString());
+                    final String old_task = modelArrayList.get(pos).getTask().toString();
                     editTask.setView(editText);
                     editTask.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+
                             String new_task_name = editText.getText().toString();
-                            modelArrayList.set(pos,new Model(new_task_name,false));
-                            notifyDataSetChanged();
+                            //Update method
+                            SQLiteDatabase db = mHelper.getWritableDatabase();
+                            ContentValues values = new ContentValues();
+                            values.put(TaskContract.TaskEntry.COL_USER_DATA_LIST_TASK,new_task_name);
+                            db.update(TaskContract.TaskEntry.TABLE,values,TaskContract.TaskEntry.COL_USER_DATA_LIST_TASK + " = ?",new String[]{old_task});
+                            db.close();
+                            updateUI();
                         }
                     });
                     editTask.setNegativeButton("CANCEL",null);
@@ -193,12 +215,12 @@ public class TaskActivity extends AppCompatActivity {
 
                     if(!modelArrayList.get(pos).getSelected()){
                         modelArrayList.get(pos).setSelected(true);
-                        //Add method to erase from databased
-
-                        String task = modelArrayList.get(pos).getTask().toString();
-                        modelArrayList.remove(modelArrayList.get(pos));
-                        notifyDataSetChanged();
-                        //
+                        String old_task = modelArrayList.get(pos).getTask().toString();
+                        //Add method to erase from database
+                        SQLiteDatabase db = mHelper.getWritableDatabase();
+                        db.delete(TaskContract.TaskEntry.TABLE,TaskContract.TaskEntry.COL_USER_DATA_LIST_TASK + " = ?",new String[]{old_task});
+                        db.close();
+                        updateUI();
                     }
                 }
             });

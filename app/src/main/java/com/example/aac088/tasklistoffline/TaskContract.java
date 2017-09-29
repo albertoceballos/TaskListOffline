@@ -1,5 +1,6 @@
 package com.example.aac088.tasklistoffline;
 
+import android.content.Context;
 import android.provider.BaseColumns;
 
 /**
@@ -7,6 +8,12 @@ import android.provider.BaseColumns;
  */
 
 public class TaskContract {//asd
+
+    public static Context context;
+
+    public void setContext(Context context){
+        this.context = context;
+    }
 
     public static final String DB_NAME = "com.example.aac088.tasklistoffline";
 

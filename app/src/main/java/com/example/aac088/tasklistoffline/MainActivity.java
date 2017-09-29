@@ -1,6 +1,7 @@
 package com.example.aac088.tasklistoffline;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -44,6 +45,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent taskIntent = new Intent(MainActivity.this,TaskActivity.class);
+                Bundle bundle = new Bundle();
+                String list_name = listView.getItemAtPosition(position).toString();
+                bundle.putString("list_name",list_name);
+                TaskContract.context = MainActivity.this;
+                taskIntent.putExtras(bundle);
                 startActivity(taskIntent);
             }
         });
